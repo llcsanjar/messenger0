@@ -251,12 +251,12 @@ const AudioPlayer = ({ msg, myId, t }) => {
             {loading ? (
               <div className="audio-loading" />
             ) : (
-              <span>▶</span>
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style={{marginLeft: '2px'}}><path d="M8 5v14l11-7z"></path></svg>
             )}
           </button>
         ) : (
           <button className="play-button" onClick={handlePause}>
-            <span>⏸</span>
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"></path></svg>
           </button>
         )}
         <div className="waveform-container">
@@ -960,7 +960,8 @@ function Chat({ selectedUser, onlineUsers, ws, language, handleMobileBack, start
   }, []);
 
   const openReactionMenu = (e, msg) => {
-    if (msg.is_deleted_for_everyone) return
+    if (msg.is_deleted_for_everyone) return;
+    if (editMenu && editMenu.message && editMenu.message._id === msg._id) return;
 
     e.preventDefault();
     e.stopPropagation();
@@ -1006,8 +1007,7 @@ function Chat({ selectedUser, onlineUsers, ws, language, handleMobileBack, start
   };
 
   const openDeleteMenuForMessage = (msg) => {
-    const isMyMessage = msg.sender_id === myId;
-    if (!isMyMessage || msg.is_deleted_for_everyone) return;
+    if (msg.is_deleted_for_everyone) return;
 
     setDeleteMenu({
       x: reactionMenu?.x || window.innerWidth / 2 - 160,
@@ -1040,7 +1040,8 @@ function Chat({ selectedUser, onlineUsers, ws, language, handleMobileBack, start
   };
 
   const handleDoubleClick = (e, msg) => {
-    if (msg.is_deleted_for_everyone) return
+    if (msg.is_deleted_for_everyone) return;
+    if (editMenu && editMenu.message && editMenu.message._id === msg._id) return;
     e.preventDefault();
     e.stopPropagation();
     clearLongPress();
@@ -1048,7 +1049,8 @@ function Chat({ selectedUser, onlineUsers, ws, language, handleMobileBack, start
   };
 
   const handleTouchStart = (e, msg) => {
-    if (msg.is_deleted_for_everyone) return
+    if (msg.is_deleted_for_everyone) return;
+    if (editMenu && editMenu.message && editMenu.message._id === msg._id) return;
     e.preventDefault();
     e.stopPropagation();
     clearLongPress();
@@ -1062,15 +1064,18 @@ function Chat({ selectedUser, onlineUsers, ws, language, handleMobileBack, start
   };
 
   const handleTouchEnd = (e, msg) => {
+    if (editMenu && editMenu.message && editMenu.message._id === msg._id) return;
     clearLongPress();
   };
 
   const handleTouchMove = (e, msg) => {
+    if (editMenu && editMenu.message && editMenu.message._id === msg._id) return;
     clearLongPress();
   };
 
   const handleMouseDown = (e, msg) => {
-    if (msg.is_deleted_for_everyone) return
+    if (msg.is_deleted_for_everyone) return;
+    if (editMenu && editMenu.message && editMenu.message._id === msg._id) return;
     if (e.button === 0) {
       e.preventDefault();
       e.stopPropagation();
@@ -1086,15 +1091,18 @@ function Chat({ selectedUser, onlineUsers, ws, language, handleMobileBack, start
   };
 
   const handleMouseUp = (e, msg) => {
+    if (editMenu && editMenu.message && editMenu.message._id === msg._id) return;
     clearLongPress();
   };
 
   const handleMouseLeave = (e, msg) => {
+    if (editMenu && editMenu.message && editMenu.message._id === msg._id) return;
     clearLongPress();
   };
 
   const handleContextMenu = (e, msg) => {
-    if (msg.is_deleted_for_everyone) return
+    if (msg.is_deleted_for_everyone) return;
+    if (editMenu && editMenu.message && editMenu.message._id === msg._id) return;
     e.preventDefault();
     e.stopPropagation();
     clearLongPress();
@@ -1205,7 +1213,7 @@ function Chat({ selectedUser, onlineUsers, ws, language, handleMobileBack, start
       if (!reactionMenu && !deleteMenu && !editMenu) return;
       const target = e.target;
       const isClickInsideReactionMenu = target.closest('.reaction-menu');
-      const isClickInsideDeleteMenu = target.closest('.delete-menu');
+      const isClickInsideDeleteMenu = target.closest('.delete-modal-content');
       const isClickInsideEditMenu = target.closest('.edit-menu');
       const isClickInsideMessage = target.closest('.my-message') || target.closest('.other-message');
       const isClickOnReactionBadge = target.closest('.reaction-badge');
@@ -1554,7 +1562,7 @@ function Chat({ selectedUser, onlineUsers, ws, language, handleMobileBack, start
               className="mobile-back-btn"
               onClick={handleMobileBack}
             >
-              ←
+              <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
             </button>
           )}
           <div className="avatar-with-status">
@@ -1581,7 +1589,7 @@ function Chat({ selectedUser, onlineUsers, ws, language, handleMobileBack, start
             onClick={() => startCall("voice", selectedUser)}
             title={t.voice_call || "Занги овозӣ"}
           >
-            📞
+            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
           </button>
           
           {/* Тугмаи Video Call */}
@@ -1590,18 +1598,22 @@ function Chat({ selectedUser, onlineUsers, ws, language, handleMobileBack, start
             onClick={() => startCall("video", selectedUser)}
             title={t.video_call || "Занги видеоӣ"}
           >
-            📹
+            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M23 7l-7 5 7 5V7z"></path><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>
           </button>
         </div>
 
         {selectedUser.public_key ? (
           <div className="e2ee-status secure" title={t.e2ee_secure}>
-            <span className="lock-icon">🔒</span>
+            <span className="lock-icon">
+              <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            </span>
             <span className="status-text">{t.e2ee_active}</span>
           </div>
         ) : (
           <div className="e2ee-status unsecure" title={t.e2ee_unsecure}>
-            <span className="lock-icon">⚠️</span>
+            <span className="lock-icon">
+              <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+            </span>
             <span className="status-text">{t.e2ee_not_found}</span>
           </div>
         )}
@@ -1633,7 +1645,9 @@ function Chat({ selectedUser, onlineUsers, ws, language, handleMobileBack, start
                 className={`deleted-message ${msg.sender_id === myId ? "my-deleted" : "other-deleted"}`}
               >
                 <div className="deleted-message-content">
-                  <span className="deleted-icon">🗑️</span>
+                  <span className="deleted-icon">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{marginRight: '6px', verticalAlign: 'middle'}}><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                  </span>
                   <span className="deleted-text">{t.deleted_message}</span>
                 </div>
               </div>
@@ -1654,7 +1668,11 @@ function Chat({ selectedUser, onlineUsers, ws, language, handleMobileBack, start
             };
 
             let callText = "";
-            let callIcon = isVoice ? "📞" : "📹";
+            let callIcon = isVoice ? (
+              <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{verticalAlign: 'middle', marginRight: '6px', display: 'inline-block'}}><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+            ) : (
+              <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{verticalAlign: 'middle', marginRight: '6px', display: 'inline-block'}}><path d="M23 7l-7 5 7 5V7z"></path><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>
+            );
             let statusClass = msg.call_status; // completed, missed, rejected
 
             if (isVoice) {
@@ -1694,7 +1712,7 @@ function Chat({ selectedUser, onlineUsers, ws, language, handleMobileBack, start
           return (
             <div
               key={idx}
-              className={msg.sender_id === myId ? "my-message" : "other-message"}
+              className={`${msg.sender_id === myId ? "my-message" : "other-message"} ${editMenu && editMenu.message && editMenu.message._id === msg._id ? "editing" : ""}`}
               onContextMenu={(e) => handleContextMenu(e, msg)}
               onDoubleClick={(e) => handleDoubleClick(e, msg)}
               onTouchStart={(e) => handleTouchStart(e, msg)}
@@ -1756,32 +1774,54 @@ function Chat({ selectedUser, onlineUsers, ws, language, handleMobileBack, start
               )}
 
               <div className="message-content">
-                {msg.message_type === 'audio'
-                  ? <AudioPlayer msg={msg} myId={myId} t={t} />
-                  : msg.message_type === 'text' ? (
-                      <MessageTextWithLinks text={msg.decryptedText || msg.text} t={t} isEdited={msg.is_edited} />
-                    ) : (
-                      translateMessageText(msg.decryptedText || msg.text, msg.message_type)
-                    )
-                }
+                {msg.message_type === 'audio' ? (
+                  <AudioPlayer msg={msg} myId={myId} t={t} />
+                ) : msg.message_type === 'text' ? (
+                  editMenu && editMenu.message && editMenu.message._id === msg._id ? (
+                    <div className="inline-edit-container" onClick={(e) => e.stopPropagation()}>
+                      <textarea
+                        className="inline-edit-textarea"
+                        value={editText}
+                        onChange={(e) => setEditText(e.target.value)}
+                        onKeyDown={handleEditKeyPress}
+                        autoFocus
+                        rows={2}
+                      />
+                      <div className="inline-edit-buttons">
+                        <button className="inline-edit-btn cancel" onClick={closeEditMenu} title={t.cancel}>
+                          <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        </button>
+                        <button className="inline-edit-btn save" onClick={handleEditSubmit} title={t.save}>
+                          <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <MessageTextWithLinks text={msg.decryptedText || msg.text} t={t} isEdited={msg.is_edited} />
+                  )
+                ) : (
+                  translateMessageText(msg.decryptedText || msg.text, msg.message_type)
+                )}
               </div>
 
               {renderReactions(msg)}
 
-              <div className="message-footer">
-                {msg.sender_id === myId && (
-                  <div className="message-status">
-                    {msg.is_read ? (
-                      <span className="checkmark read" title={t.read}>✓✓</span>
-                    ) : (
-                      <span className="checkmark sent" title={t.sent}>✓</span>
-                    )}
+              {!(editMenu && editMenu.message && editMenu.message._id === msg._id) && (
+                <div className="message-footer">
+                  {msg.sender_id === myId && (
+                    <div className="message-status">
+                      {msg.is_read ? (
+                        <span className="checkmark read" title={t.read}>✓✓</span>
+                      ) : (
+                        <span className="checkmark sent" title={t.sent}>✓</span>
+                      )}
+                    </div>
+                  )}
+                  <div className="message-time">
+                    {formatTime(msg.sent_at)}
                   </div>
-                )}
-                <div className="message-time">
-                  {formatTime(msg.sent_at)}
                 </div>
-              </div>
+              )}
             </div>
           )
         })}
@@ -1808,47 +1848,65 @@ function Chat({ selectedUser, onlineUsers, ws, language, handleMobileBack, start
       )}
 
       {/* Input */}
-      <div className="chat-input">
-        <input
-          type="text"
-          placeholder={replyTo ? `${t.reply_to}...` : t.typeMessage}
-          value={getCurrentMessage()}
-          onChange={(e) => setCurrentMessage(e.target.value)}
-          onKeyPress={(e) => {
-            if (e.key === 'Enter') {
-              sendMessage()
-            }
-          }}
-        />
+      <div className="chat-input-wrapper">
+        <div className="chat-input-bar">
+          {!isRecording ? (
+            <button
+              className="mic-button"
+              onClick={startRecording}
+              title={t.recording}
+            >
+              <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+            </button>
+          ) : (
+            <button 
+              className="cancel-recording-btn" 
+              onClick={cancelRecording} 
+              title={t.cancel}
+            >
+              <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+          )}
 
-        {!isRecording ? (
-          <button
-            className="mic-button"
-            onClick={startRecording}
-            title={t.recording}
-          >
-            🎤
-          </button>
-        ) : null}
+          {isRecording ? (
+            <div className="recording-status-bar">
+              <span className="recording-pulsing-dot"></span>
+              <span className="recording-time-text">{formatRecordingTime(recordingTime)}</span>
+              <span className="recording-hint-text">🎤 Сабти овоз...</span>
+            </div>
+          ) : (
+            <input
+              type="text"
+              placeholder={replyTo ? `${t.reply_to}...` : t.typeMessage}
+              value={getCurrentMessage()}
+              onChange={(e) => setCurrentMessage(e.target.value)}
+              onKeyPress={(e) => {
+                if (e.key === 'Enter') {
+                  sendMessage()
+                }
+              }}
+            />
+          )}
 
-        <button onClick={sendMessage}>{t.send}</button>
-      </div>
-
-      {/* Recording Controls - Floating */}
-      {isRecording && (
-        <div className="recording-controls">
-          <button className="cancel-recording" onClick={cancelRecording} title={t.cancel}>
-            ✕
-          </button>
-          <div className="recording-timer" style={{ position: 'relative', bottom: 'auto', left: 'auto', transform: 'none', background: 'transparent', padding: 0, margin: 0, border: 'none' }}>
-            <span className="recording-dot"></span>
-            <span>{formatRecordingTime(recordingTime)}</span>
-          </div>
-          <button className="send-recording" onClick={stopRecording} title={t.send_recording}>
-            📨
-          </button>
+          {isRecording ? (
+            <button 
+              className="send-recording-btn" 
+              onClick={stopRecording} 
+              title={t.send_recording}
+            >
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>
+            </button>
+          ) : (
+            <button 
+              className="send-msg-btn" 
+              onClick={sendMessage} 
+              title={t.send}
+            >
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>
+            </button>
+          )}
         </div>
-      )}
+      </div>
 
       {/* Reaction Menu */}
       {reactionMenu && (
@@ -1885,7 +1943,9 @@ function Chat({ selectedUser, onlineUsers, ws, language, handleMobileBack, start
 
           {reactionMenu.message?.message_type !== 'audio' && !reactionMenu.message?.is_deleted_for_everyone && (
             <div className="reaction-menu-copy" onClick={handleCopyText}>
-              <span className="copy-icon">📋</span>
+              <span className="copy-icon">
+                <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
+              </span>
               <span>{t.copy_text}</span>
             </div>
           )}
@@ -1894,114 +1954,74 @@ function Chat({ selectedUser, onlineUsers, ws, language, handleMobileBack, start
            reactionMenu.message?.message_type === 'text' && 
            !reactionMenu.message?.is_deleted_for_everyone && (
             <div className="reaction-menu-edit" onClick={() => openEditMenu(reactionMenu.message)}>
-              <span className="edit-icon">✏️</span>
+              <span className="edit-icon">
+                <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4z"></path></svg>
+              </span>
               <span>{t.edit}</span>
             </div>
           )}
 
-          {reactionMenu.message?.sender_id === myId && !reactionMenu.message?.is_deleted_for_everyone && (
+          {!reactionMenu.message?.is_deleted_for_everyone && (
             <div className="reaction-menu-delete" onClick={() => openDeleteMenuForMessage(reactionMenu.message)}>
-              <span className="delete-icon">🗑️</span>
+              <span className="delete-icon">
+                <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+              </span>
               <span>{t.only_delete}</span>
             </div>
           )}
         </div>
       )}
 
-      {/* Delete Menu */}
+      {/* Delete Confirmation Modal */}
       {deleteMenu && (
-        <div
-          className="delete-menu"
-          style={{
-            position: 'fixed',
-            left: deleteMenu.x + 'px',
-            top: deleteMenu.y + 'px',
-            zIndex: 10001
-          }}
-          onClick={(e) => e.stopPropagation()}
-        >
-          <div className="delete-menu-option" onClick={handleDeleteForMe}>
-            <span className="delete-icon">🗑️</span>
-            <span>{t.delete_for_me}</span>
-            <span className="delete-hint">{t.delete_hint_me}</span>
-          </div>
-          <div className="delete-menu-option warning" onClick={handleDeleteForEveryone}>
-            <span className="delete-icon">⚠️</span>
-            <span>{t.delete_for_everyone}</span>
-            <span className="delete-hint">{t.delete_hint_everyone}</span>
-          </div>
-        </div>
-      )}
-
-      {/* Edit Menu Modal */}
-      {editMenu && (
-        <div
-          className="edit-menu"
-          style={{
-            position: 'fixed',
-            left: editMenu.x + 'px',
-            top: editMenu.y + 'px',
-            zIndex: 10001,
-            background: 'var(--tg-theme-bg-color, #ffffff)',
-            borderRadius: '12px',
-            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)',
-            padding: '16px',
-            minWidth: '280px',
-            maxWidth: '90vw'
-          }}
-          onClick={(e) => e.stopPropagation()}
-        >
-          <div className="edit-menu-header" style={{ marginBottom: '12px', fontSize: '14px', color: 'var(--tg-theme-hint-color, #999)' }}>
-            {t.edit_message || "Таҳрири паём"}
-          </div>
-          <textarea
-            className="edit-textarea"
-            value={editText}
-            onChange={(e) => setEditText(e.target.value)}
-            onKeyDown={handleEditKeyPress}
-            rows={3}
-            style={{
-              width: '100%',
-              padding: '10px',
-              borderRadius: '8px',
-              border: '1px solid var(--tg-theme-button-color, #3390ec)',
-              fontSize: '14px',
-              fontFamily: 'inherit',
-              resize: 'vertical',
-              background: 'var(--tg-theme-secondary-bg-color, #f5f5f5)',
-              color: 'var(--tg-theme-text-color, #000000)'
-            }}
-            autoFocus
-          />
-          <div className="edit-menu-buttons" style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '12px' }}>
-            <button
-              className="edit-cancel-btn"
-              onClick={closeEditMenu}
-              style={{
-                padding: '8px 16px',
-                borderRadius: '8px',
-                border: 'none',
-                background: 'var(--tg-theme-secondary-bg-color, #e0e0e0)',
-                cursor: 'pointer',
-                fontSize: '14px'
-              }}
-            >
+        <div className="delete-modal-overlay" onClick={closeDeleteMenu}>
+          <div className="delete-modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="delete-modal-warning-icon">
+              <svg viewBox="0 0 24 24" width="32" height="32" stroke="#ef4444" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                <line x1="10" y1="11" x2="10" y2="17"></line>
+                <line x1="14" y1="11" x2="14" y2="17"></line>
+              </svg>
+            </div>
+            
+            <h3 className="delete-modal-title">
+              {language === 'tg' ? "Ҳазфи паём" : 
+               language === 'ru' ? "Удаление сообщения" : 
+               language === 'fa' ? "حذف پیام" : "Delete Message"}
+            </h3>
+            <p className="delete-modal-subtitle">
+              {language === 'tg' ? "Оё мехоҳед ин паёмро ҳазф кунед?" :
+               language === 'ru' ? "Вы действительно хотите удалить это сообщение?" :
+               language === 'fa' ? "آیا می‌خواهید این پیام را حذف کنید؟" : "Are you sure you want to delete this message?"}
+            </p>
+            
+            <div className="delete-modal-options">
+              <div className="delete-modal-option-card" onClick={handleDeleteForMe}>
+                <div className="option-card-header">
+                  <span className="option-card-icon">
+                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                  </span>
+                  <span className="option-card-title">{t.delete_for_me}</span>
+                </div>
+                <p className="option-card-desc">{t.delete_hint_me}</p>
+              </div>
+              
+              {deleteMenu.message?.sender_id === myId && (
+                <div className="delete-modal-option-card warning" onClick={handleDeleteForEveryone}>
+                  <div className="option-card-header">
+                    <span className="option-card-icon">
+                      <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                    </span>
+                    <span className="option-card-title">{t.delete_for_everyone}</span>
+                  </div>
+                  <p className="option-card-desc">{t.delete_hint_everyone}</p>
+                </div>
+              )}
+            </div>
+            
+            <button className="delete-modal-cancel-btn" onClick={closeDeleteMenu}>
               {t.cancel}
-            </button>
-            <button
-              className="edit-save-btn"
-              onClick={handleEditSubmit}
-              style={{
-                padding: '8px 16px',
-                borderRadius: '8px',
-                border: 'none',
-                background: 'var(--tg-theme-button-color, #3390ec)',
-                color: 'white',
-                cursor: 'pointer',
-                fontSize: '14px'
-              }}
-            >
-              {t.save || "Захира"}
             </button>
           </div>
         </div>
@@ -2011,7 +2031,11 @@ function Chat({ selectedUser, onlineUsers, ws, language, handleMobileBack, start
       {toast.show && (
         <div className={`toast-notification ${toast.type}`}>
           <span className="toast-icon">
-            {toast.type === 'success' ? '✅' : '⚠️'}
+            {toast.type === 'success' ? (
+              <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            ) : (
+              <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+            )}
           </span>
           {toast.message}
         </div>
