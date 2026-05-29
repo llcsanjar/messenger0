@@ -19,6 +19,7 @@ import { auth } from "./registration/firebase"
 import Register from "./registration/Register"
 import Dashboard from "./dashboard/Dashboard"
 import NotFound from "./NotFound"
+import { API_URL } from "./config"
 
 import './App.css'
 
@@ -28,7 +29,38 @@ function App() {
 
   useEffect(() => {
 
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+
+      if (currentUser) {
+        const hasKeys = localStorage.getItem("public_key") && localStorage.getItem("private_key")
+        if (!hasKeys) {
+          try {
+            const response = await fetch(`${API_URL}/find-user/${currentUser.email}`)
+            const data = await response.json()
+            if (data && data.email) {
+              if (!window.isEmailAlertShown) {
+                window.isEmailAlertShown = true
+                const lang = localStorage.getItem('app_language') || 'tg'
+                const alerts = {
+                  tg: "Ин почтаи электронӣ аллакай аз ҷониби корбари дигар сабт шудааст!",
+                  ru: "Этот email уже зарегистрирован другим пользователем!",
+                  en: "This email is already registered by another user!",
+                  fa: "این ایمیل قبلاً توسط کاربر دیگری ثبت شده است!"
+                }
+                alert(alerts[lang] || alerts.tg)
+                setTimeout(() => {
+                  window.isEmailAlertShown = false
+                }, 2000)
+              }
+              await auth.signOut()
+              setUser(null)
+              return
+            }
+          } catch (err) {
+            console.error("Error checking user registration:", err)
+          }
+        }
+      }
 
       setUser(currentUser)
 

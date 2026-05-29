@@ -101,6 +101,30 @@ function Register() {
         photo: result.user.photoURL,
       }
 
+      // Check if email already exists in DB when they don't have keys
+      const hasKeys = localStorage.getItem("public_key") && localStorage.getItem("private_key")
+      if (!hasKeys) {
+        const checkRes = await fetch(`${API_URL}/find-user/${result.user.email}`)
+        const checkData = await checkRes.json()
+        if (checkData && checkData.email) {
+          if (!window.isEmailAlertShown) {
+            window.isEmailAlertShown = true
+            const alerts = {
+              tg: "Ин почтаи электронӣ аллакай аз ҷониби корбари дигар сабт шудааст!",
+              ru: "Этот email уже зарегистрирован другим пользователем!",
+              en: "This email is already registered by another user!",
+              fa: "این ایمیل قبلاً توسط کاربر دیگری ثبت شده است!"
+            }
+            alert(alerts[language] || alerts.tg)
+            setTimeout(() => {
+              window.isEmailAlertShown = false
+            }, 2000)
+          }
+          await auth.signOut()
+          return
+        }
+      }
+
       // Save user state
       setUser(userData)
 
