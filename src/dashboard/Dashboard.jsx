@@ -267,7 +267,12 @@ function Dashboard() {
   useEffect(() => {
     if (!user?.email) return
 
-    const wsUrl = API_URL.replace(/^http/, "ws") + "/ws/chat"
+    // Танзими протоколи WebSocket (ws:// барои локалӣ, wss:// барои продакшн)
+    const isSecure = API_URL.startsWith("https://") || window.location.protocol === "https:"
+    const wsProtocol = isSecure ? "wss://" : "ws://"
+    const cleanApiUrl = API_URL.replace(/^https?:\/\//, "")
+    const wsUrl = `${wsProtocol}${cleanApiUrl}/ws/chat`
+    
     const ws = new WebSocket(wsUrl)
     wsRef.current = ws
     let isConnected = false
