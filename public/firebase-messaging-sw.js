@@ -21,12 +21,15 @@ messaging.onBackgroundMessage((payload) => {
     const body = payload.data.body || ""
     const type = payload.data.type || "chat"
 
-    self.registration.showNotification(title, {
-        body,
-        icon: "/logo.png",
-        tag: type === "call" ? "incoming-call" : undefined,
-        renotify: type === "call"
-    })
+    self.registration.showNotification(
+        title,
+        {
+            body: body,
+            icon: "/logo.png",
+            tag: type === "call" ? "incoming-call" : undefined,
+            renotify: type === "call"
+        }
+    )
 })
 
 self.addEventListener("notificationclick", (event) => {
@@ -37,7 +40,7 @@ self.addEventListener("notificationclick", (event) => {
     )
 })
 
-self.addEventListener("install", () => {
+self.addEventListener("install", (event) => {
     self.skipWaiting()
 })
 
