@@ -5,7 +5,7 @@ import { auth, provider } from './firebase'
 import { API_URL } from "../config"
 
 import {
-  signInWithRedirect
+  signInWithPopup
 } from 'firebase/auth'
 
 import { useNavigate } from 'react-router-dom'
@@ -89,7 +89,7 @@ function Register() {
       setLoading(true)
 
       // Google Login
-      const result = await signInWithRedirect(
+      const result = await signInWithPopup(
         auth,
         provider
       )
