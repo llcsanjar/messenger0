@@ -19,18 +19,13 @@ import { auth } from "./registration/firebase"
 import Register from "./registration/Register"
 import Dashboard from "./dashboard/Dashboard"
 import NotFound from "./NotFound"
-import AccountTransfer from "./registration/AccountTransfer"
 import { API_URL } from "./config"
-import { getSavedLanguage, getTranslation } from "./translations"
 
 import './App.css'
 
 function App() {
 
   const [user, setUser] = useState(undefined)
-  const [showTransferModal, setShowTransferModal] = useState(false)
-  const [pendingEmail, setPendingEmail] = useState(null)
-  const [pendingUser, setPendingUser] = useState(null)
 
   useEffect(() => {
 
@@ -38,16 +33,27 @@ function App() {
 
       if (currentUser) {
         const hasKeys = localStorage.getItem("public_key") && localStorage.getItem("private_key")
-        
         if (!hasKeys) {
           try {
             const response = await fetch(`${API_URL}/find-user/${currentUser.email}`)
             const data = await response.json()
-            
             if (data && data.email) {
-              setPendingEmail(currentUser.email)
-              setPendingUser(currentUser)
-              setShowTransferModal(true)
+              if (!window.isEmailAlertShown) {
+                window.isEmailAlertShown = true
+                const lang = localStorage.getItem('app_language') || 'tg'
+                const alerts = {
+                  tg: "Ин почтаи электронӣ аллакай аз ҷониби корбари дигар сабт шудааст!",
+                  ru: "Этот email уже зарегистрирован другим пользователем!",
+                  en: "This email is already registered by another user!",
+                  fa: "این ایمیل قبلاً توسط کاربر دیگری ثبت شده است!"
+                }
+                alert(alerts[lang] || alerts.tg)
+                setTimeout(() => {
+                  window.isEmailAlertShown = false
+                }, 2000)
+              }
+              await auth.signOut()
+              setUser(null)
               return
             }
           } catch (err) {
@@ -64,34 +70,22 @@ function App() {
 
   }, [])
 
-  const handleTransferSuccess = async (keys) => {
-    setShowTransferModal(false)
-    
-    if (pendingUser) {
-      setUser(pendingUser)
-    }
-  }
-
-  const handleTransferCancel = () => {
-    setShowTransferModal(false)
-    setUser(null)
-    auth.signOut()
-  }
-
-  const currentLanguage = getSavedLanguage()
-  const t = getTranslation(currentLanguage)
-
-  if (user === undefined && !showTransferModal) {
+  // Loading state
+  if (user === undefined) {
     return (
       <div className="loading">
+
         <img src="/logo.png" alt="logo" />
+
       </div>
     )
   }
 
   return (
     <BrowserRouter>
+
       <Routes>
+
         <Route
           path="/"
           element={
@@ -129,16 +123,9 @@ function App() {
         />
 
         <Route path="*" element={<NotFound />} />
+
       </Routes>
 
-      {showTransferModal && (
-        <AccountTransfer
-          email={pendingEmail}
-          onSuccess={handleTransferSuccess}
-          onCancel={handleTransferCancel}
-          t={t}
-        />
-      )}
     </BrowserRouter>
   )
 }
