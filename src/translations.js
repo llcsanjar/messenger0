@@ -92,6 +92,15 @@ const translations = {
     end_call: "Анҷоми занг",
     page_not_found: "Саҳифае, ки шумо меҷӯед, вуҷуд надорад.",
     go_back_home: "Бозгашт ба саҳифаи асосӣ",
+
+    // Барои QRCodeModal
+    transferAccount: "Интиқоли аккаунт",
+    transferNote: "Ба дастгоҳи дигар гузаред",
+    scanToTransfer: "Ин QR кодро скан кунед то калидҳои аккаунти худро ба дастгоҳи дигар интиқол диҳед",
+    generating: "Дар ҳоли тайёр кардан...",
+    qrWarning: "Ин QR код калидҳои шахсии шуморо дар бар мегирад. Онро танҳо бо дастгоҳҳои боэътимод мубодила кунед!",
+    qrTooBig: "Маълумот барои QR код хеле калон аст. Лутфан аз роҳи дигар истифода баред.",
+    copiedToClipboard: "QR код ба буфер нусха бардошта шуд!",
   },
   ru: { // Русский
     search: "Поиск...",
@@ -176,6 +185,15 @@ const translations = {
     end_call: "Завершить звонок",
     page_not_found: "Страница, которую вы ищете, не существует.",
     go_back_home: "Вернуться на главную",
+
+    // Для QRCodeModal
+    transferAccount: "Перенос аккаунта",
+    transferNote: "Перейти на другое устройство",
+    scanToTransfer: "Отсканируйте этот QR-код, чтобы передать ключи вашего аккаунта на другое устройство",
+    generating: "Генерация...",
+    qrWarning: "Этот QR-код содержит ваши личные ключи. Делитесь им только с доверенными устройствами!",
+    qrTooBig: "Данные слишком велики для QR-кода. Пожалуйста, используйте другой способ.",
+    copiedToClipboard: "QR-код скопирован в буфер обмена!",
   },
   en: { // English
     search: "Search...",
@@ -260,6 +278,15 @@ const translations = {
     end_call: "End Call",
     page_not_found: "The page you are looking for does not exist.",
     go_back_home: "Back to Home",
+
+    // For QRCodeModal
+    transferAccount: "Account Transfer",
+    transferNote: "Transfer to another device",
+    scanToTransfer: "Scan this QR code to transfer your account keys to another device",
+    generating: "Generating...",
+    qrWarning: "This QR code contains your private keys. Only share it with trusted devices!",
+    qrTooBig: "Data is too large for QR code. Please use another method.",
+    copiedToClipboard: "QR code copied to clipboard!",
   },
   fa: { // Эронӣ (Форсӣ) - RTL
     search: "جستجو...",
@@ -344,6 +371,15 @@ const translations = {
     end_call: "پایان تماس",
     page_not_found: "صفحه‌ای که به دنبال آن هستید وجود ندارد.",
     go_back_home: "بازگشت به صفحه اصلی",
+
+    // برای QRCodeModal
+    transferAccount: "انتقال حساب کاربری",
+    transferNote: "انتقال به دستگاه دیگر",
+    scanToTransfer: "این کد QR را اسکن کنید تا کلیدهای حساب خود را به دستگاه دیگری منتقل کنید",
+    generating: "در حال تولید...",
+    qrWarning: "این کد QR شامل کلیدهای خصوصی شما است. فقط با دستگاه‌های قابل اعتماد به اشتراک بگذارید!",
+    qrTooBig: "داده برای کد QR بسیار بزرگ است. لطفاً از روش دیگری استفاده کنید.",
+    copiedToClipboard: "کد QR در کلیپ‌بورد کپی شد!",
   }
 };
 

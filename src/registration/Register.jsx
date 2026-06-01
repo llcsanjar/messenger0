@@ -13,6 +13,8 @@ import { useNavigate } from 'react-router-dom'
 import { generateKeys } from './crypto'
 import { translate, getSavedLanguage, getBrowserLanguage, saveLanguage } from '../translations'
 
+import AccountTransfer from "./AccountTransfer"
+
 function Register() {
 
   const [user, setUser] = useState(null)
@@ -20,6 +22,9 @@ function Register() {
   const [language, setLanguage] = useState('tg')
   const [t, setT] = useState({})
   const [showLangMenu, setShowLangMenu] = useState(false)
+
+  const [showTransferModal, setShowTransferModal] = useState(false)
+  const [pendingEmail, setPendingEmail] = useState(null)
 
   const navigate = useNavigate()
 
@@ -88,96 +93,95 @@ function Register() {
     try {
       setLoading(true)
 
-      // Google Login
-      const result = await signInWithPopup(
-        auth,
-        provider
-      )
+      const result = await signInWithPopup(auth, provider)
 
-      // User Data
       const userData = {
         name: result.user.displayName,
         email: result.user.email,
         photo: result.user.photoURL,
       }
 
-      // Check if email already exists in DB when they don't have keys
+      // Санҷидани вуҷуди аккаунт дар backend
+      const checkRes = await fetch(`${API_URL}/find-user/${result.user.email}`)
+      const checkData = await checkRes.json()
+      
+      // Агар аккаунт вуҷуд дошта бошад ва калидҳо дар ин дастгоҳ набошанд
       const hasKeys = localStorage.getItem("public_key") && localStorage.getItem("private_key")
-      if (!hasKeys) {
-        const checkRes = await fetch(`${API_URL}/find-user/${result.user.email}`)
-        const checkData = await checkRes.json()
-        if (checkData && checkData.email) {
-          if (!window.isEmailAlertShown) {
-            window.isEmailAlertShown = true
-            const alerts = {
-              tg: "Ин почтаи электронӣ аллакай аз ҷониби корбари дигар сабт шудааст!",
-              ru: "Этот email уже зарегистрирован другим пользователем!",
-              en: "This email is already registered by another user!",
-              fa: "این ایمیل قبلاً توسط کاربر دیگری ثبت شده است!"
-            }
-            alert(alerts[language] || alerts.tg)
-            setTimeout(() => {
-              window.isEmailAlertShown = false
-            }, 2000)
-          }
-          await auth.signOut()
-          return
-        }
+      
+      if (checkData && checkData.email && !hasKeys) {
+        // Ба ҷои нишон додани хатогӣ, экрани сканро мекушоем
+        setPendingEmail(result.user.email)
+        setShowTransferModal(true)
+        setLoading(false)
+        return
       }
 
-      // Save user state
+      // Агар аккаунт вуҷуд надошта бошад ё калидҳо аллакай мавҷуданд
       setUser(userData)
-
-      // Generate E2EE keys
       await generateKeys()
-
       const pubKey = localStorage.getItem("public_key")
 
-      // Send to backend
-      const response = await fetch(
-        `${API_URL}/register`,
-        {
-          method: 'POST',
+      const response = await fetch(`${API_URL}/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: userData.name,
+          email: userData.email,
+          photo: userData.photo,
+          public_key: pubKey,
+        }),
+      })
 
-          headers: {
-            'Content-Type': 'application/json',
-          },
-
-          body: JSON.stringify({
-            name: userData.name,
-            email: userData.email,
-            photo: userData.photo,
-            public_key: pubKey,
-          }),
-        }
-      )
-
-      // Get backend result
       const data = await response.json()
 
-      console.log(data)
-
-      // Redirect ONLY if success
       if (response.ok) {
-
-        navigate('/dashboard', {
-          state: userData
-        })
-
-      } else {
-
-        console.log('Backend error')
-
+        navigate('/dashboard', { state: userData })
       }
-
     } catch (error) {
-
       console.log(error)
-
     } finally {
-
       setLoading(false)
+    }
+  }
 
+  // Функсияи пас аз интиқоли муваффақи аккаунт
+  const handleTransferSuccess = async (keys) => {
+    setShowTransferModal(false)
+    setLoading(true)
+    
+    try {
+      // Калидҳо аллакай дар localStorage захира шудаанд (дар компоненти Transfer)
+      const userData = {
+        name: auth.currentUser.displayName,
+        email: pendingEmail,
+        photo: auth.currentUser.photoURL,
+      }
+      
+      setUser(userData)
+      
+      // Тафтиши он ки оё ин корбар дар бакенд сабт шудааст
+      const response = await fetch(`${API_URL}/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: userData.name,
+          email: userData.email,
+          photo: userData.photo,
+          public_key: keys.public_key,
+        }),
+      })
+      
+      if (response.ok) {
+        navigate('/dashboard', { state: userData })
+      } else {
+        // Агар хатогӣ рух диҳад, ба саҳифаи асосӣ меравем
+        navigate('/dashboard', { state: userData })
+      }
+    } catch (err) {
+      console.error('Transfer completion error:', err)
+      navigate('/dashboard')
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -288,6 +292,19 @@ function Register() {
               </button>
             ))}
           </div>
+        )}
+
+        {showTransferModal && (
+          <AccountTransfer
+            email={pendingEmail}
+            onSuccess={handleTransferSuccess}
+            onCancel={() => {
+              setShowTransferModal(false)
+              setLoading(false)
+              auth.signOut()
+            }}
+            t={currentT}
+          />
         )}
       </div>
 

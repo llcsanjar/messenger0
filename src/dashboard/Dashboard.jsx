@@ -23,6 +23,8 @@ import {
 import "./Dashboard.css"
 import { getSavedLanguage, saveLanguage, getTranslation } from "../translations"
 
+import QRCodeModal from "./QRCodeModal"
+
 function Dashboard() {
 
   const user = auth.currentUser
@@ -43,7 +45,15 @@ function Dashboard() {
   const [unreadUsers, setUnreadUsers] = useState([])
   const [onlineUsers, setOnlineUsers] = useState({})
   const [callSession, setCallSession] = useState(null)
-  
+
+  const [showQRModal, setShowQRModal] = useState(false)
+
+  // Функсияи кушодани QR модал:
+  const openQRModal = () => {
+    setOpenModal(false) // Модали асосиро мебандад
+    setShowQRModal(true) // QR модалро мекушояд
+  }
+
   const startCall = (callType, peerUser) => {
     setCallSession({
       type: "outgoing",
@@ -552,7 +562,19 @@ function Dashboard() {
                 </button>
               </div>
             </div>
-            
+
+            <div className="qr-transfer-section">
+              <button 
+                className="qr-transfer-btn"
+                onClick={openQRModal}
+              >
+                📱 {t.transferAccount || "Интиқоли аккаунт"}
+              </button>
+              <p className="qr-transfer-note">
+                {t.transferNote || "Ба дастгоҳи дигар гузаред"}
+              </p>
+            </div>
+
             <button 
               className="close-modal-btn"
               onClick={() => setOpenModal(false)}
@@ -569,6 +591,14 @@ function Dashboard() {
           ws={wsRef.current}
           myEmail={user.email}
           onCallEnd={() => setCallSession(null)}
+          t={t}
+        />
+      )}
+
+      {showQRModal && (
+        <QRCodeModal
+          user={user}
+          onClose={() => setShowQRModal(false)}
           t={t}
         />
       )}
